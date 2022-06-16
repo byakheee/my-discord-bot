@@ -1,0 +1,11 @@
+linters:
+  enable-all: true
+  disable:
+  - exhaustivestruct
+  - golint
+  - interfacer
+  - maligned
+  - scopelint
+linters-settings:
+  goimports:
+    local-prefixes: github.com/byakheee/my-discord-bot
