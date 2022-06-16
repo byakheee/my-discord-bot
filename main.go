@@ -1,9 +1,14 @@
 package main
 
 import (
+	"flag"
 	"log"
 )
 
 func main() {
-	log.Println("Hello, world")
+	var token string
+
+	flag.StringVar(&token, "t", "", "API Token")
+	flag.Parse()
+	log.Println("Hello,", token)
 }
