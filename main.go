@@ -18,15 +18,15 @@ func main() {
 	flag.StringVar(&token, "t", "", "API Token")
 	flag.Parse()
 
-	dgclient, err := discordgo.New("Bot " + token)
+	discord, err := discordgo.New("Bot " + token)
 	if err != nil {
 		log.Fatalf("failed to create discordgo client. error: %s", err.Error())
 	}
 
 	// register handler.
-	dgclient.AddHandler(handlers.OnMessageCreate)
+	discord.AddHandler(handlers.OnMessageCreate)
 
-	if err := dgclient.Open(); err != nil {
+	if err := discord.Open(); err != nil {
 		log.Fatalf("failed to open connection. error: %s", err.Error())
 	}
 
@@ -36,5 +36,5 @@ func main() {
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-sc
-	dgclient.Close()
+	discord.Close()
 }
