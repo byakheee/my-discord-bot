@@ -1,4 +1,7 @@
 {
     "go.lintTool": "golangci-lint",
-    "go.lintOnSave": "file"
+    "go.lintOnSave": "file",
+    "go.lintFlags": [
+        "--fix"
+    ]
 }
