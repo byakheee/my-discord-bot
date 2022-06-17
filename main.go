@@ -36,5 +36,10 @@ func main() {
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-sc
-	discord.Close()
+
+	if err := discord.Close(); err != nil {
+		log.Fatalf("failed to close connection. error: %s", err.Error())
+	}
+
+	log.Println("Bot successfully shutdown!")
 }
