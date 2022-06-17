@@ -6,6 +6,7 @@ linters:
   - interfacer
   - maligned
   - scopelint
+  - gci # conflict goimports
 linters-settings:
   goimports:
     local-prefixes: github.com/byakheee/my-discord-bot
