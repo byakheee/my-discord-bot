@@ -7,20 +7,7 @@ import (
 )
 
 func OnMessageCreate(discord *discordgo.Session, message *discordgo.MessageCreate) {
-	log.Printf("guildId: %s", message.GuildID)
-	log.Printf("channelId: %s", message.ChannelID)
-	log.Printf("userId: %s", message.Author.ID)
-
-	connections, err := discord.UserConnections()
-	if err != nil {
-		log.Printf("Failed to get user connections. error: %s\n", err.Error())
-	}
-
-	log.Printf("user connects num: %d", len(connections))
-
-	for i, c := range connections {
-		log.Printf("user connectin #%d: %s", i, c.Name)
-	}
+	log.Printf("On message create!\n%#v", *message)
 
 	if message.Author.Bot {
 		return

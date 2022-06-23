@@ -24,7 +24,11 @@ func main() {
 	}
 
 	// register handler.
+	discord.AddHandler(handlers.OnConnect)
 	discord.AddHandler(handlers.OnMessageCreate)
+	discord.AddHandler(handlers.OnReady)
+	discord.AddHandler(handlers.OnVoiceServerUpdate)
+	discord.AddHandler(handlers.OnVoiceStateUpdate)
 
 	if err := discord.Open(); err != nil {
 		log.Fatalf("failed to open connection. error: %s", err.Error())
