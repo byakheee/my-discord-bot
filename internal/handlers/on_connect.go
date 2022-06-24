@@ -9,5 +9,5 @@ import (
 
 func OnConnect(discord *discordgo.Session, connect *discordgo.Connect) {
 	log.Info().Msg("On connect!")
-	logex.DebugRawJSON(connect)
+	logex.DebugAnyStruct(connect)
 }

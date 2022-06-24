@@ -9,5 +9,5 @@ import (
 
 func OnVoiceServerUpdate(discord *discordgo.Session, update *discordgo.VoiceServerUpdate) {
 	log.Info().Msg("On voice server update!")
-	logex.DebugRawJSON(update)
+	logex.DebugAnyStruct(update)
 }

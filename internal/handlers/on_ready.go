@@ -9,5 +9,5 @@ import (
 
 func OnReady(discord *discordgo.Session, ready *discordgo.Ready) {
 	log.Info().Msg("On ready!")
-	logex.DebugRawJSON(ready)
+	logex.DebugAnyStruct(ready)
 }

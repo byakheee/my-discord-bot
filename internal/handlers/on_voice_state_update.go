@@ -9,5 +9,5 @@ import (
 
 func OnVoiceStateUpdate(discord *discordgo.Session, stateUpdate *discordgo.VoiceStateUpdate) {
 	log.Info().Msg("On voice state update!")
-	logex.DebugRawJSON(stateUpdate)
+	logex.DebugAnyStruct(stateUpdate)
 }

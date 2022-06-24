@@ -6,7 +6,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func DebugRawJSON(contents any) {
+func DebugAnyStruct(contents any) {
 	c, err := json.Marshal(contents)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to marshal contents to json.")
