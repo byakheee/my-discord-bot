@@ -1,11 +1,13 @@
 package handlers
 
 import (
-	"log"
-
 	"github.com/bwmarrin/discordgo"
+	"github.com/rs/zerolog/log"
+
+	"github.com/byakheee/my-discord-bot/internal/extensions/logex"
 )
 
 func OnReady(discord *discordgo.Session, ready *discordgo.Ready) {
-	log.Printf("On ready!\n%#v", *ready)
+	log.Info().Msg("On ready!")
+	logex.DebugRawJSON(ready)
 }

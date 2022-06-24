@@ -1,11 +1,13 @@
 package handlers
 
 import (
-	"log"
-
 	"github.com/bwmarrin/discordgo"
+	"github.com/rs/zerolog/log"
+
+	"github.com/byakheee/my-discord-bot/internal/extensions/logex"
 )
 
 func OnConnect(discord *discordgo.Session, connect *discordgo.Connect) {
-	log.Printf("On connect!\n%#v", *connect)
+	log.Info().Msg("On connect!")
+	logex.DebugRawJSON(connect)
 }

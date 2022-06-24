@@ -2,28 +2,31 @@ package main
 
 import (
 	"flag"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
+	"github.com/rs/zerolog/pkgerrors"
 
 	"github.com/byakheee/my-discord-bot/internal/handlers"
 )
 
 func main() {
-	var token string
-
-	flag.StringVar(&token, "t", "", "API Token")
+	token := flag.String("t", "", "API Token")
+	isDebug := flag.Bool("debug", false, "If turn on debug mode, true")
 	flag.Parse()
+	initLogger(*isDebug)
 
-	discord, err := discordgo.New("Bot " + token)
+	discord, err := discordgo.New("Bot " + *token)
 	if err != nil {
-		log.Fatalf("failed to create discordgo client. error: %s", err.Error())
+		log.Fatal().Stack().Err(err).Msg("Failed to create discordgo")
 	}
 
-	// register handler.
+	// Register handler.
 	discord.AddHandler(handlers.OnConnect)
 	discord.AddHandler(handlers.OnMessageCreate)
 	discord.AddHandler(handlers.OnReady)
@@ -31,10 +34,10 @@ func main() {
 	discord.AddHandler(handlers.OnVoiceStateUpdate)
 
 	if err := discord.Open(); err != nil {
-		log.Fatalf("failed to open connection. error: %s", err.Error())
+		log.Fatal().Stack().Err(err).Msg("Failed to open connection")
 	}
 
-	log.Println("Bot is now running.  Press CTRL-C to exit.")
+	log.Info().Msg("Bot is now running.  Press CTRL-C to exit.")
 
 	// Wait here until CTRL-C or other term signal is received.
 	sc := make(chan os.Signal, 1)
@@ -42,8 +45,17 @@ func main() {
 	<-sc
 
 	if err := discord.Close(); err != nil {
-		log.Fatalf("failed to close connection. error: %s", err.Error())
+		log.Fatal().Stack().Err(err).Msg("Failed to close connection. error: %s")
 	}
 
-	log.Println("Bot successfully shutdown!")
+	log.Info().Msg("Bot successfully shutdown!")
+}
+
+func initLogger(debug bool) {
+	zerolog.TimeFieldFormat = time.RFC3339
+	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
+
+	if !debug {
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	}
 }
