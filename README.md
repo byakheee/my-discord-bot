@@ -7,7 +7,7 @@
 
 ```shell
 brew install pkg-config
-brew install ffmpeg --with-opus
+brew install ffmpeg
 ```
 
 ## 使い方
