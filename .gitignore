@@ -20,3 +20,6 @@ my-discord-bot
 
 # Go workspace file
 go.work
+
+# for mac
+.DS_Store

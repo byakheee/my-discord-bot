@@ -2,14 +2,19 @@ package handlers
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 
+	"github.com/bwmarrin/dgvoice"
 	"github.com/bwmarrin/discordgo"
 	"github.com/rs/zerolog/log"
 
 	"github.com/byakheee/my-discord-bot/internal/extensions/logex"
-	"github.com/byakheee/my-discord-bot/internal/gateways"
 )
+
+// nolint:gochecknoglobals
+var voiceConnection *discordgo.VoiceConnection
 
 func OnMessageCreate(discord *discordgo.Session, message *discordgo.MessageCreate) {
 	log.Info().Msg("On message create!")
@@ -48,41 +53,87 @@ func OnMessageCreate(discord *discordgo.Session, message *discordgo.MessageCreat
 }
 
 func handleCommand(discord *discordgo.Session, message *discordgo.MessageCreate) {
-	targetUserID := ""
-
-	if message.Content == "!!panic" {
-		// TODO: panicしたらリカバリしてsessionをcloseする
-		// そうじゃないと voice チャンネルに残ったままになる
-		panic("user panic!")
-	}
-
 	if message.Content == "!!away" {
-		// TODO: onCommandAwayとonCommandComehereにしよう
-		targetUserID = discord.State.User.ID
-	}
-
-	if message.Content == "!!comehere" {
-		targetUserID = message.Author.ID
-	}
-
-	channelID := gateways.GetStayngVoiceChannel(message.GuildID, targetUserID)
-	if channelID == "" {
-		log.Warn().
-			Str("TargetUserID", targetUserID).
-			Msg("target user do not stay in voice channel.")
+		onCommandAway()
 
 		return
 	}
 
-	if message.Content == "!!away" {
-		channelID = ""
+	if message.Content == "!!comehere" {
+		onCommandComehere(discord, message.GuildID, message.Author.ID)
+
+		return
 	}
 
-	if _, err := discord.ChannelVoiceJoin(message.GuildID, channelID, false, false); err != nil {
+	if message.Content == "!!play" {
+		onCommandPlay()
+
+		return
+	}
+}
+
+func onCommandComehere(discord *discordgo.Session, guildID, authorID string) {
+	voiceState, err := discord.State.VoiceState(guildID, authorID)
+	if err != nil {
+		log.Warn().
+			Str("GuildID", guildID).
+			Str("AuthorID", authorID).
+			Msg("Author do not stay in voice channel.")
+
+		return
+	}
+
+	vcon, err := discord.ChannelVoiceJoin(voiceState.GuildID, voiceState.ChannelID, false, true)
+	if err != nil {
 		log.Error().Stack().Err(err).
-			Str("GuildID", message.GuildID).
-			Str("TargetUserID", targetUserID).
-			Str("ChannelID", channelID).
+			Str("vsGuildID", voiceState.GuildID).
+			Str("vsUserID", voiceState.UserID).
+			Str("vsChannelID", voiceState.ChannelID).
 			Msg("Failed to join voice channel.")
 	}
+
+	voiceConnection = vcon
+}
+
+func onCommandAway() {
+	if voiceConnection == nil {
+		log.Warn().
+			Msg("Bot do not stay in voice channel.")
+
+		return
+	}
+
+	if err := voiceConnection.Disconnect(); err != nil {
+		log.Error().Stack().Err(err).
+			Msg("Failed to disconnect voice connection.")
+
+		return
+	}
+
+	voiceConnection.Close()
+	voiceConnection = nil
+
+	log.Info().Msg("voice connection is closed.")
+}
+
+func onCommandPlay() {
+	if voiceConnection == nil {
+		log.Warn().
+			Msg("Bot do not stay in voice channel.")
+
+		return
+	}
+
+	exec, err := os.Executable()
+	if err != nil {
+		log.Error().Stack().Err(err).
+			Msg("Failed to get os.Executable.")
+
+		return
+	}
+
+	dgvoice.PlayAudioFile(
+		voiceConnection,
+		filepath.Join(filepath.Dir(exec), "internal/assets/newtype.mp3"),
+		make(chan bool))
 }
